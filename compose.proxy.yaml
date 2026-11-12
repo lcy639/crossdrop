@@ -1,0 +1,41 @@
+# Optional, isolated outbound proxy for the Cloudflare connector.
+# Start with both compose.yaml and compose.proxy.yaml.
+services:
+  tunnel-proxy:
+    image: xjasonlyu/tun2socks:v2.7.0
+    profiles:
+      - public
+    environment:
+      PROXY: ${CROSSDROP_PROXY_URL:?Set CROSSDROP_PROXY_URL in .env to the checked Clash endpoint}
+      MTU: "1500"
+      LOGLEVEL: warn
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_ADMIN
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "ip link show tun0 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  cloudflared:
+    network_mode: service:tunnel-proxy
+    command:
+      - tunnel
+      - --no-autoupdate
+      - --protocol
+      - http2
+      - --edge-ip-version
+      - "4"
+      - --url
+      - http://crossdrop:8787
+    depends_on:
+      tunnel-proxy:
+        condition: service_healthy

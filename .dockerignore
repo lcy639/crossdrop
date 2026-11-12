@@ -1,0 +1,11 @@
+data
+.cache
+web/node_modules
+web/dist
+.git
+*.log
+PUBLIC_URL.txt
+
+.env
+.env.*
+!/.env.example

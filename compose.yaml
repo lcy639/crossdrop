@@ -1,0 +1,39 @@
+services:
+  crossdrop:
+    build: .
+    container_name: crossdrop
+    ports:
+      - "127.0.0.1:8787:8787"
+    volumes:
+      - ./data:/data
+    environment:
+      DATA_DIR: /data
+      ROOM_TTL_HOURS: ${ROOM_TTL_HOURS:-24}
+      MAX_FILE_BYTES: ${MAX_FILE_BYTES:-10737418240}
+      MAX_STORAGE_BYTES: ${MAX_STORAGE_BYTES:-53687091200}
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 60s
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    profiles:
+      - public
+    command:
+      - tunnel
+      - --no-autoupdate
+      - --url
+      - http://crossdrop:8787
+    depends_on:
+      crossdrop:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

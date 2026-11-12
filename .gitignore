@@ -1,0 +1,10 @@
+data/
+.cache/
+web/node_modules/
+web/dist/
+.env
+*.log
+PUBLIC_URL.txt
+
+.env.*
+!/.env.example

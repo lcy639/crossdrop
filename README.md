@@ -16,6 +16,23 @@ docker compose up -d --build crossdrop
 
 打开 [http://localhost:8787](http://localhost:8787)。上传文件会自动创建房间。在接收页输入配对码，或使用生成的接收链接。
 
+## Windows 双击启动
+
+Windows 需要安装 Docker Desktop。使用专用代理模式时，先运行配置所指向的代理程序，再双击项目目录中的 `启动CrossDrop.cmd`。启动器会检查 Docker，引擎未运行时尝试启动 Docker Desktop。随后启动服务，验证公网健康接口，取得当前可用网址并打开默认浏览器。首次连接可能需要等待几分钟。
+
+可以在 Windows 桌面创建指向该 CMD 文件的快捷方式。启动器根据自身所在目录定位项目，整个项目目录需要一起保留。
+
+启动器默认使用直连模式。专用代理模式可在项目 `.env` 中设置以下内容，代理地址需要填写为自己已检查可用的 SOCKS5 入口。
+
+```dotenv
+CROSSDROP_TUNNEL_MODE=proxy
+CROSSDROP_PROXY_URL=socks5://host.docker.internal:实际端口
+```
+
+`direct` 使用基础 Compose 配置，`proxy` 追加 `compose.proxy.yaml`。该选择控制 CrossDrop 连接器的出网路径。启动器支持 Windows 与 Unix 换行的 `.env` 文件，遇到无效模式值会显示配置错误。
+
+成功后，网址保存在项目的 `PUBLIC_URL.txt`。错误信息保存在 `STARTUP_LOG.txt`。启动器采用英文提示以提高 CMD 编码兼容性。公网检查失败时会继续等待，日志确认旧隧道失效后会尝试重启一次连接器。临时隧道重新创建时会生成新网址。
+
 ## 跨网络传输
 
 需要临时在外网测试时，使用 Cloudflare Quick Tunnel。

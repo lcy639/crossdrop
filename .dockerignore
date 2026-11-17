@@ -5,6 +5,7 @@ web/dist
 .git
 *.log
 PUBLIC_URL.txt
+STARTUP_LOG.txt
 
 .env
 .env.*

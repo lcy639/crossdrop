@@ -26,6 +26,8 @@ services:
     command:
       - tunnel
       - --no-autoupdate
+      - --protocol
+      - auto
       - --url
       - http://crossdrop:8787
     depends_on:
